@@ -7,7 +7,7 @@ The app runs locally on SQLite with files on disk. For production you need three
 
 Each one switches on through environment variables, with no code changes.
 
-> **Status:** the Postgres and S3/R2 paths are wired up and type-checked but **not yet run against a real database or bucket**. Docker and Postgres weren't available on the development machine. Do a staging deploy first.
+> **Status:** **Vercel + Neon + Vercel Blob** is the chosen setup. The initial Postgres migration (237 tables) is generated and committed. These paths have **not yet run against a live database or bucket**; the first Vercel deploy is that test.
 
 ---
 
@@ -53,14 +53,40 @@ After any change to collections or globals, run `npm run migrate:create -- <name
 
 **Content:** the demo seed is for local use. On production, either enter real content in the admin, or point `npm run seed` at the production database **once** for demo data, then edit it.
 
-## 4A. Vercel + Neon + R2
+## 4A. Vercel + Neon + Vercel Blob (chosen)
 
-1. Push the project to GitHub (private repo).
-2. **Neon:** create a project and copy the pooled connection string into `DATABASE_URI`.
-3. **Cloudflare R2:** create a bucket and an API token (Object Read & Write), and set the `S3_*` variables.
-4. **Vercel:** *New Project*, import the repo, add all env vars. The build command stays `npm run build`.
-5. Run migrations against Neon (section 3) before the first visit, then open `/admin` to create the owner account.
-6. Add your domain in Vercel and update `NEXT_PUBLIC_SERVER_URL`, the Razorpay webhook and the Google redirect URI.
+The repo is ready for this setup:
+- The app reads Neon's `DATABASE_URL` / `POSTGRES_URL` automatically.
+- Images go to **Vercel Blob** when `BLOB_READ_WRITE_TOKEN` is set.
+- Vercel runs `npm run vercel-build`, which applies **database migrations, then builds**.
+- The initial migration is committed in `src/migrations/`.
+
+1. **Import the project:** go to vercel.com, sign in with GitHub, then *Add New → Project*, pick `ignitivmails/rbs` and click *Deploy*. The first deploy may fail; that's fine.
+2. **Create the database:** in the project, open **Storage → Create Database → Neon (Serverless Postgres)**:
+   - Pick the region closest to India (Mumbai if offered, otherwise Singapore).
+   - Connect it to **all environments**. This adds `DATABASE_URL` and the other database variables automatically.
+3. **Create image storage:** **Storage → Create → Blob**, then connect it to all environments. This adds `BLOB_READ_WRITE_TOKEN`.
+4. **Settings → Environment Variables:** add
+   - `PAYLOAD_SECRET`: a **new** random 64-character string
+   - `NEXT_PUBLIC_SERVER_URL`: `https://<project>.vercel.app` (your domain later)
+   - `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`
+   - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`; also add `https://<project>.vercel.app/api/auth/google/callback` in Google Cloud
+   - optional: `RESEND_API_KEY`, `MSG91_*`, `SHIPROCKET_*`
+5. **Redeploy** (Deployments → ⋯ → Redeploy). The build runs the migrations, which create all the tables in Neon.
+6. **Content:** open `/admin` and create the owner account. **Or** load the demo content from your PC once, into Neon and Blob:
+   ```powershell
+   npx vercel login; npx vercel link; npx vercel env pull .env.vercel   # .env.vercel is git-ignored
+   # then copy DATABASE_URL, BLOB_READ_WRITE_TOKEN and PAYLOAD_SECRET from it:
+   $env:DATABASE_URI="<DATABASE_URL>"; $env:BLOB_READ_WRITE_TOKEN="<token>"; $env:PAYLOAD_SECRET="<same as Vercel>"; $env:NEXT_PUBLIC_SERVER_URL="https://<project>.vercel.app"
+   npm run seed
+   ```
+7. **Region:** set **Settings → Functions → Region** to match the Neon region (e.g. `bom1` Mumbai or `sin1` Singapore) for fast database access.
+8. **Plan:** Vercel **Hobby is for non-commercial use**. Upgrade to **Pro** before taking real orders.
+
+**After schema changes** (new fields or collections): run `npm run migrate:create -- <name>` locally (no database connection is needed), commit `src/migrations/`, and push. Vercel applies it on deploy.
+
+### Alternative: Neon + Cloudflare R2 outside Vercel
+Create the Neon project on neon.tech and set `DATABASE_URI`. For R2, set the `S3_*` variables instead of Blob. Everything else is the same.
 
 ## 4B. VPS with Docker
 

@@ -6,6 +6,25 @@ Format per entry: **date · version**, then what was **Added / Changed / Removed
 
 ---
 
+## 2026-10-20 · v0.7.1 — Vercel + Neon deployment setup
+
+### Decided
+- **Hosting:** Vercel, with Neon Postgres (created from Vercel Storage) and Vercel Blob for images. Netlify and MilesWeb were compared and dropped; see the chat comparison and DEPLOY.md §1.
+
+### Added
+- **Initial Postgres migration** `src/migrations/20261019_183337_initial` (237 tables), generated from the schema without a database connection.
+- `vercel-build` script: Vercel runs `payload migrate` before `next build` on every deploy.
+- **Vercel Blob** media storage (`@payloadcms/storage-vercel-blob`), used when `BLOB_READ_WRITE_TOKEN` is set. Falls back to S3/R2, then local disk.
+- DEPLOY.md §4A rewritten as a step-by-step Vercel guide.
+
+### Changed
+- The database URL is read from `DATABASE_URI`, `DATABASE_URL` or `POSTGRES_URL`; the last two are the names Neon/Vercel set.
+- Postgres never auto-changes its schema (`push: false`); production schema changes go only through committed migrations. SQLite keeps auto-sync for local development, with a separate `migrations-sqlite` folder.
+- `.gitignore` ignores all `.env.*` files except `.env.example` (e.g. `.env.vercel` from `vercel env pull`).
+- Removed the unpushed `netlify.toml` (Netlify dropped).
+
+---
+
 ## 2026-10-19 · v0.7 — Phase 7: launch readiness
 
 > **Verified locally:**

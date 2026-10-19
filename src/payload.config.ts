@@ -4,6 +4,7 @@ import { postgresAdapter } from '@payloadcms/db-postgres'
 import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
+import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import { buildConfig } from 'payload'
 import sharp from 'sharp'
 
@@ -34,7 +35,8 @@ import { UiStringGlobals } from './payload/globals/UiStrings'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
-const DATABASE_URI = process.env.DATABASE_URI || 'file:./real-bengal-sweets.db'
+// DATABASE_URI (ours) or the names Vercel's Neon integration sets automatically.
+const DATABASE_URI = process.env.DATABASE_URI || process.env.DATABASE_URL || process.env.POSTGRES_URL || 'file:./real-bengal-sweets.db'
 
 export default buildConfig({
   admin: {
@@ -74,15 +76,19 @@ export default buildConfig({
   db: DATABASE_URI.startsWith('postgres')
     ? postgresAdapter({
         pool: { connectionString: DATABASE_URI },
+        // Postgres = production: schema changes only through committed migrations, never auto-push.
+        push: false,
         migrationDir: path.resolve(dirname, 'migrations'),
       })
     : sqliteAdapter({
         client: { url: DATABASE_URI },
-        migrationDir: path.resolve(dirname, 'migrations'),
+        migrationDir: path.resolve(dirname, 'migrations-sqlite'),
       }),
   plugins: [
-    // Media on S3-compatible storage (Cloudflare R2, AWS S3…) when configured; local disk otherwise.
-    ...(process.env.S3_BUCKET
+    // Media storage: Vercel Blob (on Vercel) → S3/R2 → local ./media folder.
+    ...(process.env.BLOB_READ_WRITE_TOKEN
+      ? [vercelBlobStorage({ collections: { media: true }, token: process.env.BLOB_READ_WRITE_TOKEN })]
+      : process.env.S3_BUCKET
       ? [
           s3Storage({
             collections: { media: true },
