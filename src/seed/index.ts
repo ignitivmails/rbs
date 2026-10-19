@@ -14,6 +14,8 @@ import { sceneSvg, squareSvg, toJpeg, type ArtKind, type PaletteName } from './a
 
 type Id = number | string
 
+// Always pass a COPY ({ ...ctx }): Payload uses it as req.context, and plugins mutate it
+// (cloud storage sets skipCloudStorage after an upload, which would skip every later upload).
 const ctx = { disableRevalidate: true }
 const FRESH = process.env.SEED_FRESH === 'true'
 const log = (msg: string) => console.log(`  › ${msg}`)
@@ -58,7 +60,7 @@ async function upload(payload: Payload, filename: string, alt: string, svg: stri
     collection: 'media',
     data: { alt },
     file: { data, mimetype: 'image/jpeg', name: `${filename}.jpg`, size: data.length },
-    context: ctx,
+    context: { ...ctx },
   })
   return doc.id as Id
 }
@@ -66,12 +68,12 @@ async function upload(payload: Payload, filename: string, alt: string, svg: stri
 /** Loosely typed wrapper — seed data is validated by Payload at runtime. */
 async function updateGlobal(payload: Payload, args: { slug: string; data: Record<string, unknown>; context?: unknown }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await payload.updateGlobal({ slug: args.slug as any, data: args.data as any, context: ctx })
+  await payload.updateGlobal({ slug: args.slug as any, data: args.data as any, context: { ...ctx } })
 }
 
 async function create(payload: Payload, collection: string, data: Record<string, unknown>): Promise<Id> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const doc = await payload.create({ collection: collection as any, data: data as any, context: ctx })
+  const doc = await payload.create({ collection: collection as any, data: data as any, context: { ...ctx } })
   return doc.id as Id
 }
 
@@ -359,7 +361,7 @@ async function wipe(payload: Payload) {
   const collections = ['orders', 'customers', 'coupons', 'quantity-discounts', 'gift-boxes', 'posts', 'stores', 'otp-codes', 'reviews', 'products', 'pages', 'categories', 'delivery-zones', 'media', 'subscribers', 'enquiries']
   for (const collection of collections) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await payload.delete({ collection: collection as any, where: { id: { exists: true } }, context: ctx })
+    await payload.delete({ collection: collection as any, where: { id: { exists: true } }, context: { ...ctx } })
   }
   log('Cleared existing content')
 }
@@ -370,7 +372,7 @@ async function ensureAdmin(payload: Payload) {
   await payload.create({
     collection: 'users',
     data: { email: 'admin@realbengalsweets.local', password: 'admin12345', name: 'Store Owner', role: 'owner' },
-    context: ctx,
+    context: { ...ctx },
   })
   log('Created admin user  →  admin@realbengalsweets.local / admin12345  (change it after first login!)')
 }
@@ -389,7 +391,7 @@ async function ensureTrackOrderForm(payload: Payload) {
   const doc = res.docs[0] as { id: Id; layout?: Array<{ blockType: string }> } | undefined
   if (!doc || doc.layout?.some((b) => b.blockType === 'trackOrder')) return
   const layout = (doc.layout ?? []).filter((b) => b.blockType !== 'richText')
-  await payload.update({ collection: 'pages', id: doc.id, data: { layout: [TRACK_ORDER_BLOCK, ...layout], _status: 'published' } as never, context: ctx })
+  await payload.update({ collection: 'pages', id: doc.id, data: { layout: [TRACK_ORDER_BLOCK, ...layout], _status: 'published' } as never, context: { ...ctx } })
   log('Track Order page: added the order tracking form')
 }
 
@@ -591,7 +593,7 @@ async function ensurePhase6(payload: Payload) {
     return r.docs[0] as { id: Id; layout?: Array<Record<string, unknown> & { blockType: string }> } | undefined
   }
   const savePage = (id: Id, layout: unknown[]) =>
-    payload.update({ collection: 'pages', id, data: { layout, _status: 'published' } as never, context: ctx })
+    payload.update({ collection: 'pages', id, data: { layout, _status: 'published' } as never, context: { ...ctx } })
 
   const corporate = await pageDoc('corporate-gifting')
   if (corporate && !corporate.layout?.some((b) => b.blockType === 'enquiryForm')) {
@@ -1156,7 +1158,7 @@ async function run() {
   log(`Pages: ${Object.keys(pages).length}`)
 
   /* ---------- Globals ---------- */
-  await updateGlobal(payload, { slug: 'theme', data: { ...DEFAULT_THEME, _status: 'published' }, context: ctx })
+  await updateGlobal(payload, { slug: 'theme', data: { ...DEFAULT_THEME, _status: 'published' }, context: { ...ctx } })
 
   await updateGlobal(payload, {
     slug: 'header',
@@ -1245,7 +1247,7 @@ async function run() {
         { label: 'About Us', layout: 'link', link: ref('pages', pages['about-us']) },
       ],
     },
-    context: ctx,
+    context: { ...ctx },
   })
 
   await updateGlobal(payload, {
@@ -1261,7 +1263,7 @@ async function run() {
         { text: 'Corporate gifting is open for bulk orders', link: ref('pages', pages['corporate-gifting']) },
       ],
     },
-    context: ctx,
+    context: { ...ctx },
   })
 
   await updateGlobal(payload, {
@@ -1310,7 +1312,7 @@ async function run() {
       copyright: '© {year} Real Bengal Sweets. All rights reserved.',
       legalText: 'FSSAI Lic. No. 00000000000000 (placeholder — update in admin)',
     },
-    context: ctx,
+    context: { ...ctx },
   })
 
   await updateGlobal(payload, {
@@ -1339,7 +1341,7 @@ async function run() {
       codEnabled: true,
       enableBengali: false,
     },
-    context: ctx,
+    context: { ...ctx },
   })
   log('Globals: theme, header, announcement bar, footer, site settings')
 
