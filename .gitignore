@@ -1,0 +1,22 @@
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+.env
+.env.local
+
+# local database + uploads
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+/media/
+
+# test output
+test-results/
+playwright-report/
+
+npm-debug.log*
+.DS_Store

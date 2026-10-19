@@ -1,0 +1,242 @@
+@import "tailwindcss";
+
+/*
+ * Theme tokens come from the Theme global (see src/lib/theme.ts → ThemeStyle).
+ * Tailwind utilities like bg-primary / text-ink / font-heading read these variables,
+ * so editing the theme in the admin restyles the whole storefront without a rebuild.
+ */
+@theme inline {
+  --color-primary: var(--rbs-primary);
+  --color-primary-fg: var(--rbs-primary-fg);
+  --color-secondary: var(--rbs-secondary);
+  --color-accent: var(--rbs-accent);
+  --color-page: var(--rbs-bg);
+  --color-surface: var(--rbs-surface);
+  --color-ink: var(--rbs-text);
+  --color-muted: var(--rbs-muted);
+  --color-line: var(--rbs-border);
+  --color-success: var(--rbs-success);
+  --color-danger: var(--rbs-danger);
+  --font-heading: var(--rbs-font-heading);
+  --font-body: var(--rbs-font-body);
+}
+
+@layer base {
+  /* Fallbacks — overridden by the Theme global at runtime. */
+  :root {
+    --rbs-primary: #8b1e1e;
+    --rbs-primary-fg: #ffffff;
+    --rbs-secondary: #f6e7cc;
+    --rbs-accent: #c9962b;
+    --rbs-bg: #fff8ee;
+    --rbs-surface: #ffffff;
+    --rbs-text: #2b1b12;
+    --rbs-muted: #7a6a5e;
+    --rbs-border: #eadcc8;
+    --rbs-success: #2f7d4f;
+    --rbs-danger: #b42318;
+    --rbs-font-heading: Georgia, serif;
+    --rbs-font-body: system-ui, sans-serif;
+    --rbs-base-size: 16px;
+    --rbs-heading-weight: 600;
+    --rbs-heading-transform: none;
+    --rbs-radius: 12px;
+    --rbs-btn-radius: 12px;
+    --rbs-container: 1280px;
+  }
+
+  html {
+    font-size: var(--rbs-base-size);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--rbs-bg);
+    color: var(--rbs-text);
+    font-family: var(--rbs-font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--rbs-font-heading);
+    font-weight: var(--rbs-heading-weight);
+    text-transform: var(--rbs-heading-transform);
+    line-height: 1.15;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--rbs-primary);
+    outline-offset: 2px;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+}
+
+@layer components {
+  .container-x {
+    width: 100%;
+    max-width: var(--rbs-container);
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 768px) {
+    .container-x {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  .rounded-theme {
+    border-radius: var(--rbs-radius);
+  }
+  .rounded-b-theme {
+    border-bottom-left-radius: var(--rbs-radius);
+    border-bottom-right-radius: var(--rbs-radius);
+  }
+  .rounded-btn {
+    border-radius: var(--rbs-btn-radius);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.4rem;
+    border: 1.5px solid transparent;
+    border-radius: var(--rbs-btn-radius);
+    font-weight: 600;
+    font-size: 0.95rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color 0.2s,
+      color 0.2s,
+      border-color 0.2s,
+      opacity 0.2s;
+  }
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .btn-sm {
+    padding: 0.5rem 0.95rem;
+    font-size: 0.85rem;
+  }
+  .btn-primary {
+    background: var(--rbs-primary);
+    color: var(--rbs-primary-fg);
+  }
+  .btn-primary:not(:disabled):hover {
+    background: color-mix(in srgb, var(--rbs-primary) 85%, black);
+  }
+  .btn-secondary {
+    background: var(--rbs-accent);
+    color: #fff;
+  }
+  .btn-secondary:not(:disabled):hover {
+    background: color-mix(in srgb, var(--rbs-accent) 85%, black);
+  }
+  .btn-light {
+    background: #fff;
+    color: var(--rbs-text);
+  }
+  .btn-light:not(:disabled):hover {
+    background: var(--rbs-secondary);
+  }
+  .btn-outline {
+    border-color: currentColor;
+    background: transparent;
+    color: inherit;
+  }
+  .btn-outline:not(:disabled):hover {
+    background: color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .card {
+    background: var(--rbs-surface);
+    border-radius: var(--rbs-radius);
+  }
+  .card-border {
+    border: 1px solid var(--rbs-border);
+  }
+  .card-shadow {
+    box-shadow: 0 8px 30px -12px rgb(0 0 0 / 0.2);
+  }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  /* Rich text from the CMS */
+  .prose-rbs {
+    line-height: 1.75;
+  }
+  .prose-rbs > * + * {
+    margin-top: 1em;
+  }
+  .prose-rbs h2 {
+    font-size: 1.75rem;
+    margin-top: 1.6em;
+  }
+  .prose-rbs h3 {
+    font-size: 1.35rem;
+    margin-top: 1.4em;
+  }
+  .prose-rbs a {
+    color: var(--rbs-primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .prose-rbs ul {
+    list-style: disc;
+    padding-left: 1.4em;
+  }
+  .prose-rbs ol {
+    list-style: decimal;
+    padding-left: 1.4em;
+  }
+  .prose-rbs blockquote {
+    border-left: 3px solid var(--rbs-accent);
+    padding-left: 1em;
+    font-style: italic;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee var(--marquee-duration, 32s) linear infinite;
+}
+.marquee-wrap:hover .animate-marquee {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
