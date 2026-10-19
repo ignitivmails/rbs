@@ -35,8 +35,29 @@ import { UiStringGlobals } from './payload/globals/UiStrings'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
-// DATABASE_URI (ours) or the names Vercel's Neon integration sets automatically.
-const DATABASE_URI = process.env.DATABASE_URI || process.env.DATABASE_URL || process.env.POSTGRES_URL || 'file:./real-bengal-sweets.db'
+/**
+ * DATABASE_URI (ours), or the Postgres URL Vercel's Neon integration sets — `DATABASE_URL` /
+ * `POSTGRES_URL`, possibly with a custom prefix such as `STORAGE_DATABASE_URL`.
+ * Pooled URLs are preferred (`*_UNPOOLED` / `*_NON_POOLING` are skipped).
+ */
+function resolveDatabaseUri(): string {
+  const env = process.env
+  // A local SQLite path copied into Vercel's settings must not shadow the Neon URL.
+  if (env.DATABASE_URI && !(env.VERCEL && env.DATABASE_URI.startsWith('file:'))) return env.DATABASE_URI
+  const exact = env.DATABASE_URL || env.POSTGRES_URL
+  if (exact) return exact
+  const prefixed = Object.keys(env)
+    .filter((k) => /(^|_)(DATABASE_URL|POSTGRES_URL)$/.test(k) && env[k]?.startsWith('postgres'))
+    .sort()[0]
+  if (prefixed) return env[prefixed] as string
+  if (env.VERCEL) {
+    throw new Error(
+      'No Postgres database configured for this Vercel deployment. In Vercel: Storage → connect the Neon database to ALL environments (incl. Production), then redeploy.',
+    )
+  }
+  return 'file:./real-bengal-sweets.db'
+}
+const DATABASE_URI = resolveDatabaseUri()
 
 export default buildConfig({
   admin: {
