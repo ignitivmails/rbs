@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 
+import { startNavigationProgress } from '@/components/NavigationProgress'
+import { Spinner } from '@/components/Spinner'
 import { useStore } from '@/components/StoreProvider'
 import { trackOrderAction } from '@/lib/account-actions'
 
@@ -26,7 +28,10 @@ export function TrackOrderForm({ heading, text, buttonLabel }: { heading?: strin
           e.preventDefault()
           start(async () => {
             const r = await trackOrderAction(orderNumber, phone)
-            if (r.ok && r.url) router.push(r.url)
+            if (r.ok && r.url) {
+              startNavigationProgress()
+              router.push(r.url)
+            }
             else setError(r.message ?? t('trackNotFound'))
           })
         }}
@@ -49,7 +54,8 @@ export function TrackOrderForm({ heading, text, buttonLabel }: { heading?: strin
         </label>
         {error && <p className="text-sm text-danger">{error}</p>}
         <button type="submit" className="btn btn-primary w-full" disabled={pending || !orderNumber || phone.length !== 10}>
-          {pending ? '…' : buttonLabel || 'Track order'}
+          {pending && <Spinner />}
+          {buttonLabel || 'Track order'}
         </button>
       </form>
     </div>

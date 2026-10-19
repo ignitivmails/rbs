@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 import { useState, useTransition, type ReactNode } from 'react'
 
 import { Icon } from '@/components/Icon'
+import { Spinner } from '@/components/Spinner'
 import { useStore } from '@/components/StoreProvider'
 import { submitEnquiryAction } from '@/lib/enquiry-actions'
 import { cn } from '@/lib/utils'
@@ -130,7 +131,8 @@ export function EnquiryFormView(props: Props) {
         {result && !result.ok && <p className="text-sm text-danger sm:col-span-2">{result.message}</p>}
         <div className="sm:col-span-2">
           <button type="submit" className="btn btn-primary w-full sm:w-auto" disabled={pending}>
-            {pending ? '…' : t('enquirySubmit')}
+            {pending && <Spinner />}
+            {t('enquirySubmit')}
           </button>
         </div>
       </form>

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useTransition } from 'react'
 
 import { useCart, useHydrated } from '@/components/cart/store'
 import { Icon } from '@/components/Icon'
+import { Spinner } from '@/components/Spinner'
 import { useStore } from '@/components/StoreProvider'
 import { checkPincodeAction, type PincodeResult } from '@/lib/actions'
 import type { ID } from '@/lib/types'
@@ -61,7 +62,8 @@ export function PincodeChecker({ productId }: { productId?: ID }) {
           className="min-w-0 flex-1 rounded-theme border border-line bg-page px-3 py-2 text-sm outline-none focus:border-primary"
         />
         <button type="submit" className="btn btn-outline btn-sm" disabled={pending || pin.length !== 6}>
-          {pending ? '…' : t('pincodeCheck')}
+          {pending && <Spinner size={14} />}
+          {t('pincodeCheck')}
         </button>
       </form>
       {result && (

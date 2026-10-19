@@ -3,6 +3,7 @@
 import { useState } from 'react'
 
 import { mockPaymentAction, verifyRazorpayAction, type PaymentStart } from '@/lib/checkout-actions'
+import { Spinner } from '@/components/Spinner'
 import { formatPrice } from '@/lib/utils'
 
 declare global {
@@ -100,7 +101,7 @@ export function MockPaymentDialog({
         <p className="text-xs text-muted">Order {order.orderNumber}</p>
         <div className="mt-6 flex flex-col gap-2">
           <button type="button" disabled={busy} onClick={() => run(true)} className="btn btn-primary w-full">
-            ✓ Simulate successful payment
+            {busy ? <Spinner /> : '✓'} Simulate successful payment
           </button>
           <button type="button" disabled={busy} onClick={() => run(false)} className="btn btn-outline w-full">
             ✕ Simulate failed payment

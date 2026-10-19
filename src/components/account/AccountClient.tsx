@@ -5,6 +5,8 @@ import { useEffect, useRef, useState, useTransition } from 'react'
 
 import { useCart, type CartItem } from '@/components/cart/store'
 import { Icon } from '@/components/Icon'
+import { startNavigationProgress } from '@/components/NavigationProgress'
+import { Spinner } from '@/components/Spinner'
 import { useStore } from '@/components/StoreProvider'
 import {
   deleteAddressAction,
@@ -36,6 +38,7 @@ export function LoginPanel({ googleEnabled, returnTo, error }: { googleEnabled: 
       <div className="mt-6">
         <PhoneOtpForm
           onSuccess={() => {
+            startNavigationProgress()
             router.replace(returnTo)
             router.refresh()
           }}
@@ -93,7 +96,8 @@ export function ProfileForm({ name, email }: { name: string; email: string }) {
       </label>
       <div className="flex items-center gap-3">
         <button type="submit" className="btn btn-primary btn-sm" disabled={pending}>
-          {pending ? '…' : t('saveChanges')}
+          {pending && <Spinner size={14} />}
+          {t('saveChanges')}
         </button>
         {msg && <span className={cn('text-sm', msg.ok ? 'text-success' : 'text-danger')}>{msg.ok ? t('saved') : msg.message}</span>}
       </div>
@@ -277,11 +281,13 @@ export function LogoutButton() {
         start(async () => {
           await logoutAction()
           clearCart()
+          startNavigationProgress()
           router.replace('/')
           router.refresh()
         })
       }
     >
+      {pending && <Spinner size={14} />}
       {t('logout')}
     </button>
   )

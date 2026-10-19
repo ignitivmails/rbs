@@ -7,6 +7,8 @@ import { useEffect, useMemo, useRef, useState, useTransition, type ReactNode } f
 
 import { useCart, useHydrated } from '@/components/cart/store'
 import { Icon } from '@/components/Icon'
+import { startNavigationProgress } from '@/components/NavigationProgress'
+import { Spinner } from '@/components/Spinner'
 import { useStore } from '@/components/StoreProvider'
 import type { Quote } from '@/lib/checkout'
 import { trackBeginCheckout } from '@/lib/analytics'
@@ -190,16 +192,21 @@ export function CheckoutClient({ giftOptions, account }: { giftOptions: boolean;
     )
   }
 
+  const go = (url: string) => {
+    startNavigationProgress()
+    router.push(url)
+  }
+
   const handlers = (order: { orderNumber: string; token: string }) => ({
-    onPaid: () => router.push(`/order/${order.orderNumber}?t=${order.token}&placed=1`),
+    onPaid: () => go(`/order/${order.orderNumber}?t=${order.token}&placed=1`),
     onAbandon: (message?: string) => {
       setMock(null)
-      router.push(`/order/${order.orderNumber}?t=${order.token}${message ? '&failed=1' : ''}`)
+      go(`/order/${order.orderNumber}?t=${order.token}${message ? '&failed=1' : ''}`)
     },
   })
 
   const startPayment = (payment: PaymentStart, order: { orderNumber: string; token: string }) => {
-    if (payment.mode === 'cod') return router.push(`/order/${order.orderNumber}?t=${order.token}&placed=1`)
+    if (payment.mode === 'cod') return go(`/order/${order.orderNumber}?t=${order.token}&placed=1`)
     if (payment.mode === 'mock') return setMock({ amount: payment.amount, ...order })
     void openRazorpay(payment, order, handlers(order))
   }
@@ -524,7 +531,10 @@ export function CheckoutClient({ giftOptions, account }: { giftOptions: boolean;
         {/* Summary */}
         <aside className="h-fit space-y-4 lg:sticky lg:top-28">
           <div className="card card-border p-5">
-            <h2 className="mb-4 text-xl">{t('orderSummary')}</h2>
+            <h2 className="mb-4 flex items-center justify-between gap-2 text-xl">
+              {t('orderSummary')}
+              {quoting && <Spinner size={18} className="text-primary" label="Updating totals" />}
+            </h2>
             <ul className="divide-y divide-line">
               {summaryLines.map((l) => (
                 <li key={l.key} className="flex gap-3 py-3">
@@ -624,6 +634,7 @@ export function CheckoutClient({ giftOptions, account }: { giftOptions: boolean;
             )}
 
             <button type="submit" disabled={!canPlace} className="btn btn-primary mt-5 w-full py-3.5 text-base">
+              {placing && <Spinner size={18} />}
               {placing ? t('placingOrder') : method === 'razorpay' ? t('payNow', { amount: fmt(quote?.total ?? 0) }) : t('placeOrder')}
             </button>
             {quote && quote.errors.length > 0 && !errors.form && lineIssues.length === 0 && (
@@ -713,7 +724,8 @@ function OtpButton({ phone, label, onResult }: { phone: string; label: string; o
       disabled={pending || phone.length !== 10}
       onClick={() => start(async () => onResult(await sendOtpAction(phone)))}
     >
-      {pending ? '…' : label}
+      {pending && <Spinner size={14} />}
+      {label}
     </button>
   )
 }

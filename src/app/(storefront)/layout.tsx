@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
-import type { ReactNode } from 'react'
+import { Suspense, type ReactNode } from 'react'
+
+import { NavigationProgress } from '@/components/NavigationProgress'
 
 import { CartSync } from '@/components/account/AccountClient'
 import { CartDrawer } from '@/components/cart/CartDrawer'
@@ -48,6 +50,9 @@ export default async function StorefrontLayout({ children }: { children: ReactNo
           <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded focus:bg-surface focus:px-4 focus:py-2">
             Skip to content
           </a>
+          <Suspense fallback={null}>
+            <NavigationProgress />
+          </Suspense>
           <AnnouncementBar />
           <Header />
           <main id="main" className="flex-1">

@@ -7,6 +7,8 @@ import { setLocaleAction, subscribeAction } from '@/lib/actions'
 import { cn, formatNumber } from '@/lib/utils'
 
 import { Icon } from './Icon'
+import { startNavigationProgress } from './NavigationProgress'
+import { Spinner } from './Spinner'
 
 /* ---------------- Horizontal scroller with arrows ---------------- */
 
@@ -89,7 +91,8 @@ export function NewsletterForm({ placeholder, buttonLabel, disclaimer, source = 
           )}
         />
         <button type="submit" className="btn btn-primary" disabled={pending}>
-          {pending ? '…' : buttonLabel || 'Subscribe'}
+          {pending && <Spinner />}
+          {buttonLabel || 'Subscribe'}
         </button>
       </div>
       {result && !result.ok && <p className="mt-2 text-sm text-danger">{result.message}</p>}
@@ -119,6 +122,7 @@ export function SortSelect({ options, value, label, query = {} }: SortSelectProp
         onChange={(e) => {
           const next = new URLSearchParams(query)
           next.set('sort', e.target.value)
+          startNavigationProgress()
           router.push(`${pathname}?${next.toString()}`, { scroll: false })
         }}
         className="rounded-theme border border-line bg-surface px-3 py-2 text-sm"

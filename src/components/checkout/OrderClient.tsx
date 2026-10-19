@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState, useTransition } from 'react'
 
 import { useCart } from '@/components/cart/store'
+import { startNavigationProgress } from '@/components/NavigationProgress'
+import { Spinner } from '@/components/Spinner'
 import { useStore } from '@/components/StoreProvider'
 import { trackPurchase } from '@/lib/analytics'
 import { resumePaymentAction } from '@/lib/checkout-actions'
@@ -29,7 +31,10 @@ export function PaymentRetry({ orderNumber, token }: { orderNumber: string; toke
   const [mockAmount, setMockAmount] = useState<number | null>(null)
   const order = { orderNumber, token }
   const handlers = {
-    onPaid: () => router.replace(`/order/${orderNumber}?t=${token}&placed=1`),
+    onPaid: () => {
+      startNavigationProgress()
+      router.replace(`/order/${orderNumber}?t=${token}&placed=1`)
+    },
     onAbandon: (msg?: string) => {
       setMockAmount(null)
       if (msg) setMessage(msg)
@@ -57,7 +62,8 @@ export function PaymentRetry({ orderNumber, token }: { orderNumber: string; toke
           })
         }
       >
-        {pending ? '…' : t('retryPayment')}
+        {pending && <Spinner size={18} />}
+        {t('retryPayment')}
       </button>
       {message && <p className="text-sm text-danger">{message}</p>}
       {mockAmount !== null && <MockPaymentDialog amount={mockAmount} order={order} handlers={handlers} />}

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 
+import { Spinner } from '@/components/Spinner'
 import { useStore } from '@/components/StoreProvider'
 import { sendLoginOtpAction, verifyLoginOtpAction } from '@/lib/account-actions'
 import { cn } from '@/lib/utils'
@@ -88,7 +89,8 @@ export function PhoneOtpForm({ askName = true, submitLabel, onSuccess }: { askNa
       )}
 
       <button type="submit" className="btn btn-primary w-full" disabled={pending || phone.length !== 10 || (step === 'code' && code.length !== 6)}>
-        {pending ? '…' : step === 'phone' ? t('otpSend') : (submitLabel ?? t('verifyAndContinue'))}
+        {pending && <Spinner />}
+        {step === 'phone' ? t('otpSend') : (submitLabel ?? t('verifyAndContinue'))}
       </button>
       {step === 'code' && (
         <div className="flex justify-between text-xs">

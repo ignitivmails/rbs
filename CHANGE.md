@@ -6,6 +6,17 @@ Format per entry: **date · version**, then what was **Added / Changed / Removed
 
 ---
 
+## 2026-10-20 · v0.7.3 — Loading animations
+
+### Added
+- **Top progress bar** (theme primary → accent) on every page change: link clicks, search, sort, track order, checkout → order page, login and logout redirects. *Files:* `src/components/NavigationProgress.tsx`, `src/app/(storefront)/layout.tsx`.
+- **Page skeletons** while server pages load: a bouncing-dots loader by default, plus product-grid skeletons for shop, collections and search, and a product-page skeleton. *Files:* `src/components/Skeletons.tsx`, `loading.tsx` in `(storefront)`, `shop`, `collections/[slug]`, `search`, `products/[slug]`.
+- **Image shimmer** until each image has loaded. *File:* `src/components/Img.tsx`.
+- **Button spinners** replace the "…" text on every waiting action: newsletter, track order, enquiry, pincode check, OTP send/verify, profile save, logout, place order, retry payment and the test-payment dialog. The checkout summary also shows a spinner while totals refresh. *File:* `src/components/Spinner.tsx`, used across forms.
+- Animations switch off when the visitor's OS has *reduce motion* turned on. *File:* `src/app/(storefront)/globals.css`.
+
+---
+
 ## 2026-10-20 · v0.7.2 — Live site fixes
 
 ### Fixed
