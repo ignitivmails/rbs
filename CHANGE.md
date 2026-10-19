@@ -6,6 +6,20 @@ Format per entry: **date · version**, then what was **Added / Changed / Removed
 
 ---
 
+## 2026-10-20 · v0.7.2 — Live site fixes
+
+### Fixed
+- **Mobile menu ("sidebar") was squashed to the header's height.** The header's `backdrop-blur` makes it the containing block for `position: fixed` children, so the full-screen drawer was 64 px tall and couldn't scroll. The drawer now renders in a React portal on `<body>`.
+  *Files:* `src/components/layout/HeaderClient.tsx`. Regression test: "mobile menu drawer fills the screen and scrolls" in `e2e/shop.spec.ts`.
+- **Seed uploaded only the first image to Vercel Blob.** Every operation shared one `context` object, and the storage plugin sets `skipCloudStorage` on it after an upload. Each operation now gets its own copy.
+- **Live images returned 500:** Vercel had named the Blob token `BLOB_STORE_ID_READ_WRITE_TOKEN`, in a newer format Payload's adapter rejects. Added `BLOB_READ_WRITE_TOKEN` (the `vercel_blob_rw_…` token) to Production.
+- **Blob store must be Public** (Payload's adapter supports public stores only). A public store replaced the private one.
+
+### Deployed
+- Live at https://rbs-opal-phi.vercel.app with the full demo content (Neon Singapore, 184 images on Vercel Blob).
+
+---
+
 ## 2026-10-20 · v0.7.1 — Vercel + Neon deployment setup
 
 ### Decided

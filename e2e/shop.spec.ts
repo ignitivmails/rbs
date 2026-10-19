@@ -11,6 +11,22 @@ test('homepage renders all main sections @mobile', async ({ page }) => {
   await expect(page.getByRole('contentinfo')).toBeVisible()
 })
 
+test('mobile menu drawer fills the screen and scrolls @mobile', async ({ page }) => {
+  test.skip((page.viewportSize()?.width ?? 0) >= 768, 'mobile-only menu')
+  await gotoReady(page, '/')
+  await page.getByRole('button', { name: 'Open menu' }).click()
+  const drawer = page.getByRole('dialog', { name: 'Menu' })
+  await expect(drawer).toBeVisible()
+  // Regression: the header's backdrop-blur once squashed this fixed drawer to the header's height.
+  const height = await drawer.evaluate((el) => (el.querySelector('.overflow-y-auto') as HTMLElement).clientHeight)
+  expect(height).toBeGreaterThan((page.viewportSize()?.height ?? 0) * 0.9)
+  await drawer.getByRole('button', { name: /Shop All/ }).click()
+  await expect(drawer.getByRole('link', { name: 'Classic Sponge Rosogolla' })).toBeVisible()
+  await drawer.getByRole('link', { name: 'Our Stores' }).click()
+  await expect(page).toHaveURL(/\/our-stores/)
+  await expect(drawer).toBeHidden()
+})
+
 test('mega menu opens on hover', async ({ page }) => {
   await gotoReady(page, '/')
   await page.getByRole('navigation', { name: 'Main' }).getByRole('button', { name: 'Shop All' }).hover()

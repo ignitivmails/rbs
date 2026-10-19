@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 
 import { cartCount, useCart, useHydrated } from '@/components/cart/store'
 import { Icon } from '@/components/Icon'
@@ -206,8 +207,10 @@ export function HeaderClient(props: Props) {
         </nav>
       )}
 
-      {/* Mobile drawer */}
-      {mobileOpen && (
+      {/* Mobile drawer — portalled to <body>: the header's backdrop-blur makes it the containing
+          block for position:fixed children, which squashed the drawer to the header's height. */}
+      {mobileOpen &&
+        createPortal(
         <div className="fixed inset-0 z-[60] md:hidden" role="dialog" aria-modal="true" aria-label="Menu">
           <button type="button" aria-label="Close menu" className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
           <div className="absolute left-0 top-0 flex h-full w-[86%] max-w-sm flex-col overflow-y-auto bg-surface">
@@ -219,8 +222,9 @@ export function HeaderClient(props: Props) {
             </div>
             <MobileNav nav={nav} />
           </div>
-        </div>
-      )}
+        </div>,
+          document.body,
+        )}
     </header>
   )
 }
