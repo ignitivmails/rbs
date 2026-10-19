@@ -85,8 +85,11 @@ The repo is ready for this setup:
 
 **After schema changes** (new fields or collections): run `npm run migrate:create -- <name>` locally (no database connection is needed), commit `src/migrations/`, and push. Vercel applies it on deploy.
 
-### Alternative: Neon + Cloudflare R2 outside Vercel
-Create the Neon project on neon.tech and set `DATABASE_URI`. For R2, set the `S3_*` variables instead of Blob. Everything else is the same.
+**Rule for migrations:** generate them **locally** (no database or tokens needed):
+```powershell
+$env:DATABASE_URI='postgres://x:y@127.0.0.1:5999/x'; npm run migrate:create -- <name>; Remove-Item Env:DATABASE_URI
+```
+The Blob plugin always registers its media fields (`alwaysInsertFields`), so the schema is the same with or without a Blob token.
 
 ## 4B. VPS with Docker
 

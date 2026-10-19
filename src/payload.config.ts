@@ -3,7 +3,6 @@ import { fileURLToPath } from 'url'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import { s3Storage } from '@payloadcms/storage-s3'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import { buildConfig } from 'payload'
 import sharp from 'sharp'
@@ -106,26 +105,14 @@ export default buildConfig({
         migrationDir: path.resolve(dirname, 'migrations-sqlite'),
       }),
   plugins: [
-    // Media storage: Vercel Blob (on Vercel) → S3/R2 → local ./media folder.
-    ...(process.env.BLOB_READ_WRITE_TOKEN
-      ? [vercelBlobStorage({ collections: { media: true }, token: process.env.BLOB_READ_WRITE_TOKEN })]
-      : process.env.S3_BUCKET
-      ? [
-          s3Storage({
-            collections: { media: true },
-            bucket: process.env.S3_BUCKET,
-            config: {
-              region: process.env.S3_REGION || 'auto',
-              endpoint: process.env.S3_ENDPOINT || undefined,
-              forcePathStyle: Boolean(process.env.S3_ENDPOINT),
-              credentials: {
-                accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
-                secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
-              },
-            },
-          }),
-        ]
-      : []),
+    // Media on Vercel Blob when BLOB_READ_WRITE_TOKEN is set; local ./media folder otherwise.
+    // alwaysInsertFields keeps the database schema identical with or without a token
+    // (migrations are generated locally without one).
+    vercelBlobStorage({
+      collections: { media: true },
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+      alwaysInsertFields: true,
+    }),
   ],
   sharp,
 })

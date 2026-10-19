@@ -17,6 +17,12 @@ Format per entry: **date · version**, then what was **Added / Changed / Removed
 - **Vercel Blob** media storage (`@payloadcms/storage-vercel-blob`), used when `BLOB_READ_WRITE_TOKEN` is set. Falls back to S3/R2, then local disk.
 - DEPLOY.md §4A rewritten as a step-by-step Vercel guide.
 
+### Fixed (first live deploy)
+- **"No migration directory … migrations-sqlite" / application error:** the Vercel build found no Postgres URL and fell back to SQLite. The app now detects the Neon URL under any prefix (e.g. `STORAGE_DATABASE_URL`), ignores a copied `file:` `DATABASE_URI` on Vercel, and stops the build with a clear message when no database is connected.
+- **`column "_objectkey" does not exist` on image upload:** the Blob plugin adds media fields only when a token is present, and the migration was generated without one. The plugin now uses `alwaysInsertFields`, and migration `20261019_192113_media_storage_fields` adds the two columns.
+- Removed the S3/R2 storage option (Vercel Blob chosen). Both plugins would add the same media fields twice.
+- `vercel link` had created a `.env.local` with production settings, which would have pointed local `npm run dev` at the live database. Deleted; `.gitignore` keeps `.env.example` tracked.
+
 ### Changed
 - The database URL is read from `DATABASE_URI`, `DATABASE_URL` or `POSTGRES_URL`; the last two are the names Neon/Vercel set.
 - Postgres never auto-changes its schema (`push: false`); production schema changes go only through committed migrations. SQLite keeps auto-sync for local development, with a separate `migrations-sqlite` folder.
