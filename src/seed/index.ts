@@ -1347,7 +1347,7 @@ async function run() {
 
   await ensurePhase6(payload)
 
-  console.log('\n✅ Done! Start the app with `npm run dev`, then open http://localhost:3000 (admin: /admin)\n')
+  console.log('\n✅ Done! Start the app with `npm run dev`, then open http://localhost:3000 (admin: /rbsadmin)\n')
 }
 
 /** Content changed outside Next.js: clear the storefront cache (running server + on-disk cache). */

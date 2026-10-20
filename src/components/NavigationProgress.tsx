@@ -3,6 +3,8 @@
 import { usePathname, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 
+import { ADMIN_ROUTE } from '@/lib/admin-route'
+
 const START_EVENT = 'rbs:navigation-start'
 
 /** Call before router.push / router.replace to show the top progress bar. */
@@ -58,7 +60,7 @@ export function NavigationProgress() {
       if (!a || !a.href || a.target === '_blank' || a.hasAttribute('download')) return
       const url = new URL(a.href, location.href)
       if (url.origin !== location.origin) return
-      if (url.pathname.startsWith('/admin') || url.pathname.startsWith('/api/') || url.pathname.startsWith('/next/')) return
+      if (url.pathname.startsWith(ADMIN_ROUTE) || url.pathname.startsWith('/api/') || url.pathname.startsWith('/next/')) return
       if (url.pathname === location.pathname && url.search === location.search) return // same page / hash link
       start()
     }

@@ -2,6 +2,7 @@
 
 import { headers } from 'next/headers'
 
+import { ADMIN_ROUTE } from './admin-route'
 import { getSite } from './data'
 import { sendSms } from './notify'
 import { normalizePhone } from './otp'
@@ -80,7 +81,7 @@ export async function submitEnquiryAction(input: EnquiryInput): Promise<{ ok: bo
       await payload.sendEmail({
         to: notifications.adminEmail,
         subject: `New ${type} enquiry from ${name}${quantity ? ` (${quantity} boxes)` : ''}`,
-        html: `<p><strong>${name}</strong> ${clean(input.company, 120)}<br>${phone ? `+91 ${phone}` : ''} ${email}</p><p>${String(input.message ?? '').slice(0, 2000).replace(/</g, '&lt;')}</p><p><a href="${serverURL}/admin/collections/enquiries/${(doc as { id: string | number }).id}">Open in admin</a></p>`,
+        html: `<p><strong>${name}</strong> ${clean(input.company, 120)}<br>${phone ? `+91 ${phone}` : ''} ${email}</p><p>${String(input.message ?? '').slice(0, 2000).replace(/</g, '&lt;')}</p><p><a href="${serverURL}${ADMIN_ROUTE}/collections/enquiries/${(doc as { id: string | number }).id}">Open in admin</a></p>`,
       })
     } else {
       payload.logger.info(`[Enquiry] New ${type} enquiry from ${name} — set an alert email in Settings → Notifications`)

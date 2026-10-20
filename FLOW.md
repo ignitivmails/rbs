@@ -228,7 +228,7 @@ export function RenderBlocks({ blocks }) {
 sequenceDiagram
     autonumber
     actor A as Admin / Editor
-    participant P as Payload Admin (/admin)
+    participant P as Payload Admin (/rbsadmin)
     participant DB as PostgreSQL
     participant N as Next.js storefront
 

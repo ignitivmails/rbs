@@ -7,6 +7,7 @@ import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import { buildConfig } from 'payload'
 import sharp from 'sharp'
 
+import { ADMIN_ROUTE } from './lib/admin-route'
 import { Categories } from './payload/collections/Categories'
 import { Coupons } from './payload/collections/Coupons'
 import { Customers } from './payload/collections/Customers'
@@ -59,6 +60,7 @@ function resolveDatabaseUri(): string {
 const DATABASE_URI = resolveDatabaseUri()
 
 export default buildConfig({
+  routes: { admin: ADMIN_ROUTE },
   admin: {
     user: Users.slug,
     importMap: { baseDir: path.resolve(dirname) },

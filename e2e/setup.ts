@@ -13,7 +13,7 @@ const PAGES = [
   '/account',
   '/corporate-gifting',
   '/order/none?t=x',
-  '/admin',
+  '/rbsadmin',
 ]
 
 export default async function setup() {

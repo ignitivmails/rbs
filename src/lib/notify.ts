@@ -1,5 +1,6 @@
 import type { Payload } from 'payload'
 
+import { ADMIN_ROUTE } from './admin-route'
 import { fillTemplate, NOTIFICATION_EVENTS } from './notification-templates'
 import type { NotificationEvent } from './order-status'
 import type { Order } from './types'
@@ -102,7 +103,7 @@ export async function notifyOrder(payload: Payload, order: Order, event: Notific
         to: adminEmail,
         subject: `New order ${order.orderNumber} — ${formatPrice(order.total)} (${order.paymentMethod === 'cod' ? 'COD' : 'Paid online'})`,
         html: emailHtml(
-          `${order.customerName} (${order.phone}) placed order ${order.orderNumber}.\n\nDeliver to: ${order.address?.city ?? ''} ${order.address?.pincode ?? ''} — ${vars.deliveryDate}${order.deliverySlot ? `, ${order.deliverySlot}` : ''}.\n\nOpen in admin: ${serverURL()}/admin/collections/orders/${order.id}`,
+          `${order.customerName} (${order.phone}) placed order ${order.orderNumber}.\n\nDeliver to: ${order.address?.city ?? ''} ${order.address?.pincode ?? ''} — ${vars.deliveryDate}${order.deliverySlot ? `, ${order.deliverySlot}` : ''}.\n\nOpen in admin: ${serverURL()}${ADMIN_ROUTE}/collections/orders/${order.id}`,
           order,
           siteName,
           true,

@@ -28,7 +28,7 @@ Then open:
 | URL | What |
 |---|---|
 | http://localhost:3000 | Storefront |
-| http://localhost:3000/admin | Admin panel |
+| http://localhost:3000/rbsadmin | Admin panel |
 
 **Demo admin login:** `admin@realbengalsweets.local` / `admin12345`. Change it under **Settings → Admin users** after you log in.
 
@@ -70,7 +70,7 @@ Local data lives in `real-bengal-sweets.db` (database) and `media/` (uploads). D
 
 ## 3. Customising the site (no code)
 
-Everything is in the admin at `/admin`:
+Everything is in the admin at `/rbsadmin` (change the path in `src/lib/admin-route.ts` and rename the `src/app/(payload)/rbsadmin` folder to match):
 
 | Want to change… | Go to |
 |---|---|

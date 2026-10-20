@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 import { RenderBlocks } from '@/blocks/RenderBlocks'
+import { ADMIN_ROUTE } from '@/lib/admin-route'
 import { getPage } from '@/lib/data'
 import { toImage } from '@/lib/utils'
 
@@ -43,7 +44,7 @@ function EmptyHome() {
       <p className="mx-auto mt-4 max-w-lg text-muted">
         No homepage yet. Run <code className="rounded bg-ink/5 px-1.5 py-0.5">npm run seed</code> to load demo content, or create a page with the
         slug <code className="rounded bg-ink/5 px-1.5 py-0.5">home</code> in the{' '}
-        <a href="/admin" className="text-primary underline">
+        <a href={ADMIN_ROUTE} className="text-primary underline">
           admin panel
         </a>
         .

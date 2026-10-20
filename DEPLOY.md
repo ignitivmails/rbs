@@ -73,7 +73,7 @@ The repo is ready for this setup:
    - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`; also add `https://<project>.vercel.app/api/auth/google/callback` in Google Cloud
    - optional: `RESEND_API_KEY`, `MSG91_*`, `SHIPROCKET_*`
 5. **Redeploy** (Deployments → ⋯ → Redeploy). The build runs the migrations, which create all the tables in Neon.
-6. **Content:** open `/admin` and create the owner account. **Or** load the demo content from your PC once, into Neon and Blob:
+6. **Content:** open `/rbsadmin` and create the owner account. **Or** load the demo content from your PC once, into Neon and Blob:
    ```powershell
    npx vercel login; npx vercel link; npx vercel env pull .env.vercel   # .env.vercel is git-ignored
    # then copy DATABASE_URL, BLOB_READ_WRITE_TOKEN and PAYLOAD_SECRET from it:

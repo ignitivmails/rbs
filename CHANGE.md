@@ -6,6 +6,15 @@ Format per entry: **date · version**, then what was **Added / Changed / Removed
 
 ---
 
+## 2026-10-20 · v0.7.4 — Admin moved to /rbsadmin
+
+### Changed
+- **Admin panel URL is now `/rbsadmin`** (was `/admin`). `/admin` now shows the shop's "page not found". The path lives in one constant, `src/lib/admin-route.ts`, used by the Payload config (`routes.admin`), the order/enquiry notification links, the "no homepage" link and the progress bar.
+  *Files:* `src/lib/admin-route.ts` (new), `src/payload.config.ts`, route folder renamed `src/app/(payload)/admin` → `src/app/(payload)/rbsadmin`, `src/app/(payload)/layout.tsx`, `src/lib/notify.ts`, `src/lib/enquiry-actions.ts`, `src/components/RenderPage.tsx`, `src/components/NavigationProgress.tsx`, e2e tests, docs.
+- **robots.txt no longer lists the admin path**, so the new URL isn't advertised. The admin pages already tell search engines not to index them.
+
+---
+
 ## 2026-10-20 · v0.7.3 — Loading animations
 
 ### Added

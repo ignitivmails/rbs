@@ -108,7 +108,7 @@ Customization is designed in **four layers**. Nothing a shopper sees is hard-cod
  Shopper ──────▶ │  (storefront)  /  /shop  /products/[slug] ...    │
                  │      │  Server Components fetch via Payload       │
                  │      ▼  Local API (no HTTP hop)                   │
- Admin  ───────▶ │  (payload)  /admin   ← Payload admin UI          │
+ Admin  ───────▶ │  (payload)  /rbsadmin ← Payload admin UI          │
                  │      │                                            │
                  │  API routes: /api/checkout, /api/razorpay/webhook │
                  └──────┼────────────────────────────────────────────┘
@@ -202,7 +202,7 @@ Adding a new block = 1 Payload block config + 1 React component + 1 line in the 
 | `/stores` | Store locator |
 | `/blog`, `/blog/[slug]`, `/sweets-library/[slug]` | Content |
 | `/search` | Search results |
-| `/admin` | Payload admin |
+| `/rbsadmin` | Payload admin |
 
 ---
 
@@ -225,7 +225,7 @@ Adding a new block = 1 Payload block config + 1 React component + 1 line in the 
 
 ## 10. Admin Experience
 
-- Payload admin at `/admin`, role-based (owner / editor / order-manager).
+- Payload admin at `/rbsadmin`, role-based (owner / editor / order-manager).
 - **Live preview** side-by-side for pages and globals.
 - Drafts, version history, restore.
 - Dashboard widgets: today's orders, revenue, low stock, new enquiries.

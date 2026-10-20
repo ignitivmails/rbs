@@ -117,6 +117,6 @@ test('corporate enquiry form', async ({ page }) => {
 })
 
 test('admin login screen loads', async ({ page }) => {
-  await page.goto('/admin') // Payload admin — not the storefront, so no hydration marker
+  await page.goto('/rbsadmin') // Payload admin — not the storefront, so no hydration marker
   await expect(page.getByLabel(/email/i)).toBeVisible()
 })
